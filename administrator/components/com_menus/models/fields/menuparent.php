@@ -75,17 +75,35 @@ class JFormFieldMenuParent extends JFormFieldList
 			JError::raiseWarning(500, $e->getMessage());
 		}
 
-		// Pad the option text with spaces using depth level as a multiplier.
-		for ($i = 0, $n = count($options); $i < $n; $i++)
-		{
-			//$options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text;
-            $titleAlias = '(' . JText::_('JFIELD_ALIAS_LABEL') . ': ' . $db->escape($options[$i]->alias) . ')';
-            $options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text . ' ' . $titleAlias;
-		}
+        // Pad the option text with spaces using depth level as a multiplier.
+        for ($i = 0, $n = count($options); $i < $n; $i++)
+        {
+            $titleAlias = "\n" . JText::_('JFIELD_ALIAS_LABEL') . ': ' . $db->escape($options[$i]->alias);
+            $options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text . $titleAlias;
+        }
 
-		// Merge any additional options in the XML definition.
-		$options = array_merge(parent::getOptions(), $options);
+        // Merge any additional options in the XML definition.
+        $options = array_merge(parent::getOptions(), $options);
 
-		return $options;
+        $js = '
+        (function($){
+            $(window).load(function(){
+                $("#' . $this->id . '.chzn-done option").each(
+                    function(){
+                        var arr = $(this).html().split(/\n/);
+                        var html = arr[1] ? arr[0]+"<br />&#160;&#160;<small>("+arr[1]+")</small>" : arr[0];
+                        $(this).html(html);
+                    }
+                );
+
+                $("#' . $this->id . '").trigger("liszt:updated");
+
+            });
+        })(jQuery);
+        ';
+
+        JFactory::getDocument()->addScriptDeclaration($js);
+
+        return $options;
 	}
 }
