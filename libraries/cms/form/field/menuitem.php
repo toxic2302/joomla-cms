@@ -154,6 +154,8 @@ class JFormFieldMenuitem extends JFormFieldGroupedList
 	{
 		$groups = array();
 
+        $db = JFactory::getDbo();
+
 		$menuType = $this->menuType;
 
 		// Get the menu items.
@@ -185,6 +187,7 @@ class JFormFieldMenuitem extends JFormFieldGroupedList
 			// Build the options array.
 			foreach ($items as $link)
 			{
+			    $titleAlias = JText::sprintf('JGLOBAL_LIST_ALIAS', $db->escape($link->alias));
 				$levelPrefix = str_repeat('- ', max(0, $link->level - 1));
 
 				// Displays language code if not set to All
@@ -198,7 +201,7 @@ class JFormFieldMenuitem extends JFormFieldGroupedList
 				}
 
 				$groups[$menuTitle][] = JHtml::_('select.option',
-								$link->value, $levelPrefix . $link->text . $lang,
+								$link->value, $levelPrefix . $link->text . $lang . ' ' . $titleAlias,
 								'value',
 								'text',
 								in_array($link->type, $this->disable)
@@ -217,6 +220,7 @@ class JFormFieldMenuitem extends JFormFieldGroupedList
 				// Build the options array.
 				foreach ($menu->links as $link)
 				{
+                    $titleAlias = JText::sprintf('JGLOBAL_LIST_ALIAS', $db->escape($link->alias));
 					$levelPrefix = str_repeat('- ', $link->level - 1);
 
 					// Displays language code if not set to All
@@ -230,7 +234,7 @@ class JFormFieldMenuitem extends JFormFieldGroupedList
 					}
 
 					$groups[$menu->title][] = JHtml::_('select.option',
-										$link->value, $levelPrefix . $link->text . $lang,
+										$link->value, $levelPrefix . $link->text . $lang . ' ' . $titleAlias,
 										'value',
 										'text',
 										in_array($link->type, $this->disable)
